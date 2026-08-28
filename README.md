@@ -2,40 +2,40 @@
 
 Repositorio público de utilidades pequeñas, portables y gestionadas por EAP.
 Cada Pocketool vive en su propia carpeta, declara su contrato en
-`pocketool.json` y se publica como un ZIP verificable. EAP consume
-`pocketools.catalog.json`; no necesita Git para instalar una utilidad.
+`pocketool.json` y EAP la descarga directamente desde el árbol `main` del
+repositorio. No hay catálogos generados, ZIPs, tags ni GitHub Releases.
 
 ## Estructura
 
 ```text
-pocketools.catalog.json       catálogo generado y consumido por EAP
 pocketools/<id>/
   pocketool.json              manifiesto fuente
   README.md                   ayuda ampliada
   src/                        código de la utilidad
-scripts/build.py              genera ZIPs y catálogo con SHA256
+scripts/test.py               valida contratos y comportamiento
 ```
 
 ## Desarrollo y publicación
 
 ```powershell
-python scripts/build.py
 python scripts/test.py
 ```
 
-El catálogo y los ZIPs son deterministas. Para publicar una versión:
+Para publicar una versión:
 
 1. Actualizar el código y `version` en el manifiesto.
-2. Ejecutar `python scripts/build.py` y versionar el catálogo resultante.
-3. Crear y subir el tag `<id>-v<version>`, por ejemplo
-   `sessionkeep-v1.0.0`.
+2. Ejecutar `python scripts/test.py`.
+3. Hacer commit y push a `main`.
 
-La automatización crea la GitHub Release y adjunta el ZIP cuyo nombre está
-declarado en el catálogo.
+En la siguiente actualización del índice, EAP descubre automáticamente el
+manifiesto. La versión debe incrementarse cuando cambie el comportamiento o el
+código instalado.
 
 ## Contrato de seguridad
 
-- Los artefactos se descargan sólo por HTTPS y se verifican con SHA256.
+- EAP fija cada instalación al commit de `main` consultado y descarga los
+  archivos desde `raw.githubusercontent.com` usando ese commit.
+- El tamaño y el identificador de cada blob se contrastan con el árbol GitHub.
 - Los paquetes no tienen hooks de instalación ni pueden escribir fuera de su
   payload durante la instalación.
 - Los datos mutables se guardan en la ruta `EAP_POCKETOOL_DATA` que proporciona

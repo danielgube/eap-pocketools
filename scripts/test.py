@@ -2,36 +2,36 @@ from __future__ import annotations
 
 import json
 import subprocess
-import sys
 import tempfile
-import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
-    subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "build.py")],
-        cwd=ROOT,
-        check=True,
-    )
-    catalog = json.loads(
-        (ROOT / "pocketools.catalog.json").read_text(encoding="utf-8")
-    )
-    if catalog.get("schemaVersion") != 1 or not catalog.get("pocketools"):
-        raise RuntimeError("El catálogo generado no contiene Pocketools")
-    for entry in catalog["pocketools"]:
-        archive = ROOT / "dist" / entry["artifact"]["fileName"]
-        with zipfile.ZipFile(archive) as package:
-            package.testzip()
-            manifest = json.loads(package.read("pocketool.json"))
-        if manifest != {
-            key: value for key, value in entry.items() if key != "artifact"
-        }:
-            raise RuntimeError(
-                f"El manifiesto empaquetado diverge para {entry['id']}"
-            )
+    manifest_path = ROOT / "pocketools" / "sessionkeep" / "pocketool.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    required = {
+        "schemaVersion",
+        "id",
+        "name",
+        "version",
+        "description",
+        "license",
+        "platform",
+        "help",
+        "commands",
+        "requires",
+        "install",
+    }
+    missing = sorted(required - manifest.keys())
+    if missing or manifest.get("id") != "sessionkeep":
+        raise RuntimeError(
+            "Manifiesto Session Keep no válido: " + ", ".join(missing)
+        )
+    for relative in manifest["install"]["requiredFiles"]:
+        if not (manifest_path.parent / relative).is_file():
+            raise RuntimeError(f"Falta el archivo declarado {relative}")
     sessionkeep = ROOT / "pocketools" / "sessionkeep" / "src" / "sessionkeep.ps1"
     with tempfile.TemporaryDirectory() as temporary:
         environment = dict(__import__("os").environ)
@@ -100,7 +100,7 @@ def main() -> int:
                 + stopped.stdout
                 + stopped.stderr
             )
-    print("Contrato, artefactos y ayuda de Session Keep: OK")
+    print("Manifiesto y ciclo start/status/stop de Session Keep: OK")
     return 0
 
 

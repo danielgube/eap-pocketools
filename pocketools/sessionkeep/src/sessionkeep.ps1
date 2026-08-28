@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Position = 0)]
     [string] $Action = "help",
@@ -84,7 +84,7 @@ function Remove-StaleState {
 
 function Show-SessionKeepHelp {
     @"
-Session Keep 1.0.0
+Session Keep 1.0.1
 
 Mantiene activa la sesión de Windows mediante una instancia oculta y única.
 
