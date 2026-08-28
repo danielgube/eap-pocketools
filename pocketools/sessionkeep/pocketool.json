@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "sessionkeep",
+  "name": "Session Keep",
+  "version": "1.0.0",
+  "description": "Mantiene activa la sesión de Windows y evita la suspensión de la pantalla mientras se ejecuta.",
+  "license": "MIT",
+  "platform": {
+    "os": "windows",
+    "architecture": "any"
+  },
+  "help": {
+    "summary": "Mantiene activa la sesión sin permisos de administrador y se ejecuta en segundo plano.",
+    "usage": "sessionkeep <start|stop|status|--help>",
+    "details": [
+      "start inicia una única instancia oculta.",
+      "stop solicita una parada ordenada de la instancia activa.",
+      "status muestra el PID y la hora de inicio.",
+      "run ejecuta el worker en primer plano y está pensado para diagnóstico."
+    ]
+  },
+  "commands": [
+    {
+      "name": "sessionkeep",
+      "type": "powershell",
+      "entrypoint": "src/sessionkeep.ps1",
+      "arguments": []
+    }
+  ],
+  "requires": {
+    "pocketools": [],
+    "components": []
+  },
+  "install": {
+    "requiredFiles": [
+      "src/sessionkeep.ps1"
+    ]
+  }
+}
