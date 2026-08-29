@@ -15,6 +15,12 @@ pocketools/<id>/
 scripts/test.py               valida contratos y comportamiento
 ```
 
+## Pocketools disponibles
+
+- `sessionkeep`: mantiene activa la sesión de Windows durante tareas largas.
+- `zipme`: empaqueta el fuente de un proyecto respetando `.gitignore` o,
+  cuando no existe, omitiendo artefactos reconstruibles habituales.
+
 ## Desarrollo y publicación
 
 ```powershell

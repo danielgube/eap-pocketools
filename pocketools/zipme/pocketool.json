@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "zipme",
+  "name": "ZipMe",
+  "version": "1.0.0",
+  "description": "Empaqueta el código fuente de un proyecto sin artefactos reconstruibles ni metadatos de control de versiones.",
+  "license": "MIT",
+  "platform": {
+    "os": "windows",
+    "architecture": "any"
+  },
+  "help": {
+    "summary": "Crea un archivo 7z ligero del proyecto actual o de la ruta indicada.",
+    "usage": "zipme [ruta] [-Output archivo.7z|archivo.zip] [-List]",
+    "details": [
+      "Si el proyecto contiene .gitignore, respeta sus reglas aunque no sea un repositorio Git.",
+      "Sin .gitignore excluye target, node_modules, builds, cachés, metadatos VCS y archivos de IDE.",
+      "Sin argumentos crea <proyecto>.7z dentro de la carpeta del proyecto.",
+      "-List muestra qué archivos se incluirían sin crear el archivo comprimido."
+    ]
+  },
+  "commands": [
+    {
+      "name": "zipme",
+      "type": "powershell",
+      "entrypoint": "src/zipme.ps1",
+      "arguments": []
+    }
+  ],
+  "requires": {
+    "pocketools": [],
+    "components": []
+  },
+  "install": {
+    "requiredFiles": [
+      "src/zipme.ps1"
+    ]
+  }
+}
