@@ -291,11 +291,12 @@ def test_zipme() -> None:
 
 def main() -> int:
     manifests = validate_manifests()
-    expected = {"sessionkeep", "zipme"}
-    if set(manifests) != expected:
+    required_examples = {"sessionkeep", "zipme"}
+    missing_examples = sorted(required_examples - manifests.keys())
+    if missing_examples:
         raise RuntimeError(
-            f"Pocketools inesperadas: esperado={sorted(expected)}, "
-            f"obtenido={sorted(manifests)}"
+            "Faltan las Pocketools con pruebas de comportamiento: "
+            + ", ".join(missing_examples)
         )
     print(f"Manifiestos Pocketool válidos: {', '.join(sorted(manifests))}")
     test_sessionkeep()

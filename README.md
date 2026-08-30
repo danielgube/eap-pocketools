@@ -15,6 +15,12 @@ pocketools/<id>/
 scripts/test.py               valida contratos y comportamiento
 ```
 
+## Crear una Pocketool
+
+El contrato completo, los tipos de comando, las restricciones de seguridad y
+el procedimiento de prueba están en
+[`CREAR_POCKETOOLS.md`](CREAR_POCKETOOLS.md).
+
 ## Pocketools disponibles
 
 - `sessionkeep`: mantiene activa la sesión de Windows durante tareas largas.
