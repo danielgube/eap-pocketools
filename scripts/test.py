@@ -121,6 +121,90 @@ def test_sessionkeep() -> None:
     print("Ciclo start/status/stop de Session Keep: OK")
 
 
+def test_ssltruster() -> None:
+    ssltruster = POCKETOOLS / "ssltruster" / "src" / "ssltruster.ps1"
+    command = powershell(ssltruster)
+    with tempfile.TemporaryDirectory() as temporary:
+        environment = dict(os.environ)
+        environment["EAP_POCKETOOL_DATA"] = temporary
+        environment["EAP_SSLTRUSTER_TEST_MODE"] = "1"
+        environment["EAP_SSLTRUSTER_TEST_RUNTIMES"] = (
+            "Windows,EAP,Node,Java,Python,Go"
+        )
+
+        help_result = run([*command, "--help"], cwd=ROOT, environment=environment)
+        assert_success(help_result, "La ayuda de SSL Truster")
+        if "ssltruster approve <url>" not in help_result.stdout:
+            raise RuntimeError("La ayuda de SSL Truster no contiene su uso")
+
+        approved = run(
+            [
+                *command,
+                "approve",
+                "https://example.test/repositorio",
+                "-Json",
+            ],
+            cwd=ROOT,
+            environment=environment,
+        )
+        assert_success(approved, "La aprobación simulada de SSL Truster")
+        approved_payload = json.loads(approved.stdout)
+        if approved_payload["status"] != "approved":
+            raise RuntimeError("SSL Truster no aprobó la URL simulada")
+        if {item["name"] for item in approved_payload["checks"]} != {
+            "Windows",
+            "EAP",
+            "Node",
+            "Java",
+            "Python",
+            "Go",
+        }:
+            raise RuntimeError("SSL Truster no ejecutó todas las sondas")
+
+        listed = run(
+            [*command, "list", "-Json"], cwd=ROOT, environment=environment
+        )
+        assert_success(listed, "El listado de SSL Truster")
+        listed_payload = json.loads(listed.stdout)
+        if listed_payload[0]["url"] != "https://example.test/repositorio":
+            raise RuntimeError("SSL Truster no conservó la URL aprobada")
+
+        other_profile_environment = dict(environment)
+        other_profile_environment["EAP_PROFILE"] = "otro"
+        other_profile = run(
+            [*command, "list", "-Json"],
+            cwd=ROOT,
+            environment=other_profile_environment,
+        )
+        assert_success(other_profile, "El aislamiento por profile de SSL Truster")
+        if json.loads(other_profile.stdout) != []:
+            raise RuntimeError("SSL Truster mezcló URLs de profiles diferentes")
+
+        invalid = run(
+            [*command, "approve", "http://example.test", "-Json"],
+            cwd=ROOT,
+            environment=environment,
+        )
+        if invalid.returncode == 0:
+            raise RuntimeError("SSL Truster aceptó una URL sin HTTPS")
+
+        failing_environment = dict(environment)
+        failing_environment["EAP_SSLTRUSTER_TEST_FAIL"] = "Java"
+        failed = run(
+            [*command, "approve", "https://failed.test", "-Json"],
+            cwd=ROOT,
+            environment=failing_environment,
+        )
+        if failed.returncode == 0:
+            raise RuntimeError("SSL Truster aprobó una URL con Java en error")
+        state = json.loads(
+            (Path(temporary) / "ssltruster.json").read_text(encoding="utf-8")
+        )
+        if any(item["url"] == "https://failed.test/" for item in state["urls"]):
+            raise RuntimeError("SSL Truster guardó una URL que no superó las sondas")
+    print("Aprobación, validación y persistencia de SSL Truster: OK")
+
+
 def selected_paths(output: str) -> set[str]:
     lines = [line.strip().replace("\\", "/") for line in output.splitlines()]
     marker = next(
@@ -291,7 +375,7 @@ def test_zipme() -> None:
 
 def main() -> int:
     manifests = validate_manifests()
-    required_examples = {"sessionkeep", "zipme"}
+    required_examples = {"sessionkeep", "ssltruster", "zipme"}
     missing_examples = sorted(required_examples - manifests.keys())
     if missing_examples:
         raise RuntimeError(
@@ -300,6 +384,7 @@ def main() -> int:
         )
     print(f"Manifiestos Pocketool válidos: {', '.join(sorted(manifests))}")
     test_sessionkeep()
+    test_ssltruster()
     test_zipme()
     return 0
 

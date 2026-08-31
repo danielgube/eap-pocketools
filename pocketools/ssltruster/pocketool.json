@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "ssltruster",
+  "name": "SSL Truster",
+  "version": "1.0.0",
+  "description": "Aprueba URLs HTTPS y comprueba la confianza TLS de Windows, EAP y los runtimes activos.",
+  "license": "MIT",
+  "platform": {
+    "os": "windows",
+    "architecture": "any"
+  },
+  "help": {
+    "summary": "Aprueba y vuelve a comprobar URLs HTTPS sin desactivar TLS.",
+    "usage": "ssltruster [approve <url>|list|recheck|repair|import <certificado>|status|--help]",
+    "details": [
+      "Sin argumentos abre el menú interactivo.",
+      "Una URL sólo se aprueba cuando funciona con Windows y todos los runtimes compatibles instalados."
+    ]
+  },
+  "commands": [
+    {
+      "name": "ssltruster",
+      "type": "powershell",
+      "entrypoint": "src/ssltruster.ps1",
+      "arguments": []
+    }
+  ],
+  "requires": {
+    "pocketools": [],
+    "components": []
+  },
+  "install": {
+    "requiredFiles": [
+      "src/ssltruster.ps1",
+      "src/probes/SslTrusterProbe.java",
+      "src/probes/ssltruster_probe.js",
+      "src/probes/ssltruster_probe.py",
+      "src/probes/ssltruster_probe.go"
+    ]
+  }
+}

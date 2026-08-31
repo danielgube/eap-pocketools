@@ -24,6 +24,8 @@ el procedimiento de prueba están en
 ## Pocketools disponibles
 
 - `sessionkeep`: mantiene activa la sesión de Windows durante tareas largas.
+- `ssltruster`: aprueba URLs HTTPS y verifica la confianza TLS con Windows,
+  EAP y los runtimes activos sin desactivar la validación.
 - `zipme`: empaqueta el fuente de un proyecto respetando `.gitignore` o,
   cuando no existe, omitiendo artefactos reconstruibles habituales.
 
