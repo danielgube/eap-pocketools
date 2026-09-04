@@ -29,6 +29,7 @@ def run(
     *,
     cwd: Path,
     environment: dict[str, str],
+    input_text: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         command,
@@ -37,6 +38,7 @@ def run(
         text=True,
         errors="replace",
         capture_output=True,
+        input=input_text,
         check=False,
     )
 
@@ -136,6 +138,16 @@ def test_ssltruster() -> None:
         assert_success(help_result, "La ayuda de SSL Truster")
         if "ssltruster approve <url>" not in help_result.stdout:
             raise RuntimeError("La ayuda de SSL Truster no contiene su uso")
+
+        escaped_menu = run(
+            command,
+            cwd=ROOT,
+            environment=environment,
+            input_text="\x1b\n",
+        )
+        assert_success(escaped_menu, "La salida con Esc del menú de SSL Truster")
+        if "Opción no válida." in escaped_menu.stdout + escaped_menu.stderr:
+            raise RuntimeError("SSL Truster no reconoció la tecla Esc en el menú")
 
         approved = run(
             [

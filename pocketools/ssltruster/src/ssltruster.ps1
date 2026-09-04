@@ -799,7 +799,7 @@ function Show-SslTrusterStatus {
 
 function Show-SslTrusterHelp {
     @"
-SSL Truster 1.0.0
+SSL Truster 1.0.1
 
 Aprueba URLs HTTPS y verifica su funcionamiento sin desactivar TLS.
 
@@ -852,6 +852,34 @@ function Wait-SslTruster {
     [void](Read-Host "Pulse Intro para continuar")
 }
 
+function Read-SslTrusterMenuChoice {
+    if ([Console]::IsInputRedirected) {
+        $choice = [Console]::In.ReadLine()
+        if ($null -eq $choice) {
+            return "Esc"
+        }
+        if ($choice -eq [string][char]27) {
+            return "Esc"
+        }
+        return $choice.Trim()
+    }
+
+    try {
+        Write-Host "Opción: " -NoNewline
+        $key = [Console]::ReadKey($true)
+        if ($key.Key -eq [ConsoleKey]::Escape) {
+            Write-Host "Esc"
+            return "Esc"
+        }
+        $choice = ([string]$key.KeyChar).Trim()
+        Write-Host $choice
+        return $choice
+    }
+    catch {
+        return (Read-Host "Opción").Trim()
+    }
+}
+
 function Invoke-InteractiveMenu {
     while ($true) {
         Clear-Host
@@ -864,7 +892,7 @@ function Invoke-InteractiveMenu {
         Write-ActionRow -Shortcut "[5]" -Text "Estado"
         Write-ActionRow -Shortcut "[Esc]" -Text "Salir"
         Write-Host "└───────────────────────────────────────────────────────────────────┘"
-        $choice = (Read-Host "Opción").Trim()
+        $choice = Read-SslTrusterMenuChoice
         if ($choice -in @("Esc", "esc", "q", "Q")) {
             return
         }

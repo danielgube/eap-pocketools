@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ssltruster",
   "name": "SSL Truster",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aprueba URLs HTTPS y comprueba la confianza TLS de Windows, EAP y los runtimes activos.",
   "license": "MIT",
   "platform": {
